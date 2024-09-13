@@ -9,18 +9,18 @@ router.post('/register', candidateController.registerCandidate);
 router.post('/login', candidateController.loginCandidate);
 
 // Get a single candidate by ID (protected)
-router.get('/:id', protect, candidateController.getCandidateById);
+router.get('/:id', candidateController.getCandidateById);
 
 // Get all candidates (protected)
-router.get('/', protect, candidateController.getAllCandidates);
+router.get('/', candidateController.getAllCandidates);
 
 // Update a candidate profile (protected)
-router.put('/:id', protect, candidateController.updateCandidate);
+router.put('/:id', candidateController.updateCandidate);
 
 // Delete a candidate (protected)
-router.delete('/:id', protect, candidateController.deleteCandidate);
+router.delete('/:id',  candidateController.deleteCandidate);
 
 // Protected route for getting candidate profile
-router.get('/profile', protect, candidateController.getProfile);
+router.get('/profile', candidateController.getProfile);
 
 module.exports = router;
