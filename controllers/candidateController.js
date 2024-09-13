@@ -1,58 +1,64 @@
-// controllers/candidateController.js
 const Candidate = require('../models/candidateModel');
+const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Register new candidate (Create)
-exports.registerCandidate = async (req, res) => {
-    const { name, email, password, skills, experience, resume } = req.body;
+// Create Candidate
+exports.createCandidate = async (req, res) => {
+    const { userId, education, experience, resumeLink, skills } = req.body;
 
     try {
-        const candidateExists = await Candidate.findOne({ email });
-        if (candidateExists) {
-            return res.status(400).json({ message: 'Candidate already exists' });
+        const userExists = await User.findById(userId);
+        if (!userExists) {
+            return res.status(400).json({ message: 'User does not exist' });
         }
 
-        const candidate = new Candidate({ name, email, password, skills, experience, resume });
-        await candidate.save();
+        const candidateExists = await Candidate.findOne({ userId });
+        if (candidateExists) {
+            return res.status(400).json({ message: 'Candidate profile already exists for this user' });
+        }
 
-        res.status(201).json({ message: 'Candidate registered successfully', candidate });
+        const candidate = new Candidate({ 
+            userId, 
+            education, 
+            experience, 
+            resumeLink, 
+            skills 
+        });
+        const savedCandidate = await candidate.save();
+
+        res.status(201).json(savedCandidate);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-// Get a single candidate by ID (Read)
+// Get all Candidates
+exports.getAllCandidates = async (req, res) => {
+    try {
+        const candidates = await Candidate.find().populate('userId', 'name email');
+        res.json(candidates);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// Get Candidate by ID
 exports.getCandidateById = async (req, res) => {
     try {
-        const candidate = await Candidate.findById(req.params.id).select('-password');
+        const candidate = await Candidate.findById(req.params.id).populate('userId', 'name email');
         if (!candidate) {
             return res.status(404).json({ message: 'Candidate not found' });
         }
         res.json(candidate);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-// Get all candidates (Read All)
-exports.getAllCandidates = async (req, res) => {
-    try {
-        // Define userQuery for filtering and searching users
-        const candidateQuery = {}; // Default query, you can add filters here
-        if (req.query.candidateId) {
-          query.candidateId = req.query.candidateId;
-        }
-        const candidates = await Candidate.find().select('-password');
-        res.json(candidates);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-// Update candidate profile (Update)
+// Update Candidate
 exports.updateCandidate = async (req, res) => {
-    const { name, email, skills, experience, resume } = req.body;
+    const { education, experience, resumeLink, skills } = req.body;
 
     try {
         const candidate = await Candidate.findById(req.params.id);
@@ -60,21 +66,19 @@ exports.updateCandidate = async (req, res) => {
             return res.status(404).json({ message: 'Candidate not found' });
         }
 
-        // Only update if fields are provided
-        candidate.name = name || candidate.name;
-        candidate.email = email || candidate.email;
-        candidate.skills = skills || candidate.skills;
+        candidate.education = education || candidate.education;
         candidate.experience = experience || candidate.experience;
-        candidate.resume = resume || candidate.resume;
+        candidate.resumeLink = resumeLink || candidate.resumeLink;
+        candidate.skills = skills || candidate.skills;
 
         const updatedCandidate = await candidate.save();
-        res.json({ message: 'Candidate updated successfully', updatedCandidate });
+        res.json(updatedCandidate);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-// Delete a candidate (Delete)
+// Delete Candidate
 exports.deleteCandidate = async (req, res) => {
     try {
         const candidate = await Candidate.findById(req.params.id);
@@ -83,59 +87,23 @@ exports.deleteCandidate = async (req, res) => {
         }
 
         await candidate.remove();
-        res.json({ message: 'Candidate deleted successfully' });
+        res.json({ message: 'Candidate removed' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-
-exports.getCandidateByEmail = async (req, res) => {
-    try {
-      const { email } = req.body;
-      const candidate = await Candidate.findOne({ email });
-      candidate.id = Candidate._id.toString();
-  
-      if (!candidate) {
-        return res.status(404).json({ message: 'Candidate not found' });
-      }
-      res.json(candidate);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: error.message });
-    }
-  };
 
 // Get candidate profile
 exports.getProfile = async (req, res) => {
     try {
-        const candidate = await Candidate.findById(req.user.id).select('-password');
+        const candidate = await Candidate.findOne({ userId: req.user.id }).populate('userId', '-password');
         if (!candidate) {
-            return res.status(404).json({ message: 'Candidate not found' });
+            return res.status(404).json({ message: 'Candidate profile not found' });
         }
         res.json(candidate);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-// Login candidate
-exports.loginCandidate = async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const candidate = await Candidate.findOne({ email });
-        if (!candidate) {
-            return res.status(400).json({ message: 'Invalid email or password' });
-        }
-
-        const isMatch = await bcrypt.compare(password, candidate.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid email or password' });
-        }
-
-        const token = jwt.sign({ id: candidate._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-        res.json({ token, candidate: { id: candidate._id, name: candidate.name, email: candidate.email } });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-};
+// Note: Login functionality should be handled in userController, not here

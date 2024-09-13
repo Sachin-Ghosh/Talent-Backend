@@ -2,11 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const candidateController = require('../controllers/candidateController');
-const { protect } = require('../middlewares/authMiddleware');
+// const { protect } = require('../middlewares/authMiddleware');
 
 // Candidate registration and login routes
-router.post('/register', candidateController.registerCandidate);
-router.post('/login', candidateController.loginCandidate);
+router.post('/register', candidateController.createCandidate);
 
 // Get a single candidate by ID (protected)
 router.get('/:id', candidateController.getCandidateById);

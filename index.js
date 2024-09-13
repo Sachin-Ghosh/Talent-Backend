@@ -9,8 +9,16 @@ require('dotenv').config(); // Load environment variables from .env file
 require('./cronJob');
 
 
-// routes import 
+// Import route files
+const userRoutes = require('./routes/userRoutes');
 const candidateRoutes = require('./routes/candidateRoutes');
+const onboardingRoutes = require('./routes/onboardingRoutes');
+const jobRoutes = require('./routes/jobRoutes')
+const interviewRoutes = require('./routes/interviewRoutes');
+const applicationRoutes = require('./routes/applicationRoutes');
+const employerRoutes = require('./routes/employerRoutes'); // Add this line
+
+
 
 const authenticateToken = require('./middlewares/authMiddleware');
 
@@ -37,8 +45,14 @@ app.use(bodyParser.json());
 
 
 
-// all the routes 
+// Routes
+app.use('/api/users', userRoutes);
 app.use('/api/candidates', candidateRoutes);
+app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/interviews', interviewRoutes);
+app.use('/api/jobs', jobRoutes);
+app.use('/api', applicationRoutes); // Note: This route doesn't have a prefix in the original file
+app.use('/api/employers', employerRoutes);
 // admin routes
 
 // app.use(adminBroApp);

@@ -1,6 +1,6 @@
 // middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
-const Candidate = require('../models/candidateModel');
+const User = require('../models/userModel');
 
 exports.protect = async (req, res, next) => {
     const token = req.header('Authorization');
@@ -23,7 +23,7 @@ exports.protect = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         console.log('Decoded token:', decoded);
-        req.user = decoded;
+        req.user = await User.findById(decoded.id).select('-password');
         next();
     } catch (error) {
         console.error('Token verification error:', error);
