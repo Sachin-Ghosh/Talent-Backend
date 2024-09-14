@@ -40,7 +40,8 @@ connectDB();
 
 
 // middleware 
-app.use(cors());
+app.use(cors({origin: '*', // or your frontend URL in production
+    credentials: true}));
 // this code is for accepting data in port request
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
