@@ -22,4 +22,11 @@ router.delete('/:id',  candidateController.deleteCandidate);
 // Protected route for getting candidate profile
 router.get('/profile', candidateController.getProfile);
 
+// Upload resume
+router.post('/:id/resume', candidateController.uploadResume);
+
+// Get resume
+router.get('/:id/resume', candidateController.getResume);
+
+
 module.exports = router;

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Candidate = require("./candidateModel"); 
 const Job = require("./jobModel"); 
+const Screening = require("./screeningModel"); 
 
 const ApplicationSchema = new mongoose.Schema({
     candidateId: {
@@ -22,6 +23,11 @@ const ApplicationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    screeningId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Screening'
+    },
+    expectedSalary: Number
 }, { timestamps: true });
 
 const Application = mongoose.model('Application', ApplicationSchema);

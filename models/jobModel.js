@@ -25,22 +25,32 @@ const JobSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    salaryRange: {
-        type: String,
-    },
+    expectedSalaryRange: {
+        min: Number,
+        max: Number
+      },
     location: {
         type: String,
         required: true,
     },
-    // applicants: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Candidate',
-    // }],
-    // status: {
-    //     type: String,
-    //     enum: ['Open', 'Closed'],
-    //     default: 'Open',
-    // },
+    screeningStages: {
+        stage1: { type: Boolean, default: true },
+        stage2: { type: Boolean, default: true },
+        stage3: { type: Boolean, default: true }
+      },
+      testId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Test'
+      },
+    applicants: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Candidate',
+    }],
+    status: {
+        type: String,
+        enum: ['Open', 'Closed'],
+        default: 'Open',
+    },
 }, { timestamps: true });
 
 const Job = mongoose.model('Job', JobSchema);

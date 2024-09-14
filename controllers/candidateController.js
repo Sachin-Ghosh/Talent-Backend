@@ -1,5 +1,6 @@
 const Candidate = require('../models/candidateModel');
 const User = require('../models/userModel');
+const upload = require('../utils/fileUpload');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -8,8 +9,8 @@ exports.createCandidate = async (req, res) => {
     const { userId, education, experience, resumeLink, skills } = req.body;
 
     try {
-        const userExists = await User.findById(userId);
-        if (!userExists) {
+        const user = await User.findById(userId);
+        if (!user) {
             return res.status(400).json({ message: 'User does not exist' });
         }
 
@@ -25,10 +26,14 @@ exports.createCandidate = async (req, res) => {
             resumeLink, 
             skills 
         });
+
         const savedCandidate = await candidate.save();
 
         res.status(201).json(savedCandidate);
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Duplicate key error. This candidate profile may already exist.' });
+        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -107,3 +112,43 @@ exports.getProfile = async (req, res) => {
 };
 
 // Note: Login functionality should be handled in userController, not here
+
+// Upload Resume
+exports.uploadResume = (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ message: err });
+        }
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        try {
+            const candidate = await Candidate.findById(req.params.id);
+            if (!candidate) {
+                return res.status(404).json({ message: 'Candidate not found' });
+            }
+
+            candidate.resume = req.file.path;
+            await candidate.save();
+
+            res.status(200).json({ message: 'Resume uploaded successfully', filePath: req.file.path });
+        } catch (error) {
+            res.status(500).json({ message: 'Server error', error: error.message });
+        }
+    });
+};
+
+// Get Resume
+exports.getResume = async (req, res) => {
+    try {
+        const candidate = await Candidate.findById(req.params.id);
+        if (!candidate || !candidate.resume) {
+            return res.status(404).json({ message: 'Resume not found' });
+        }
+
+        res.download(candidate.resume);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};

@@ -20,7 +20,10 @@ const CandidateSchema = new mongoose.Schema({
     }],
     resumeLink: {
         type: String,
-    },
+    },//FILE UPLOAD
+    resume: {
+        type: String, // This will store the file path
+      },
     appliedJobs: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Job',
@@ -28,6 +31,7 @@ const CandidateSchema = new mongoose.Schema({
     skills: {
         type: [String],
         required: true,
+        default: []
     },
     createdAt: {
         type: Date,
