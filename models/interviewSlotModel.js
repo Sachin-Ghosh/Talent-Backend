@@ -8,10 +8,6 @@ const InterviewSlotSchema = new mongoose.Schema({
     ref: 'Job',
     required: true
   },
-  calendlyEventTypeId: {
-    type: String,
-    required: true,
-  },
   applicationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Application'
@@ -19,7 +15,25 @@ const InterviewSlotSchema = new mongoose.Schema({
   meetingLink: {
     type: String,
     required: true,
-  }
+  },
+  availableSlots: [{
+    start: {
+      type: Date,
+      required: true
+    },
+    end: {
+      type: Date,
+      required: true
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    isBooked: {
+      type: Boolean,
+      default: false
+    }
+  }]
 }, { timestamps: true });
 
 const InterviewSlot = mongoose.model('InterviewSlot', InterviewSlotSchema);

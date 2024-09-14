@@ -5,11 +5,11 @@ const Employer = require('../models/employerModel');
 
 // Create a new job (Admin/Employer)
 exports.createJob = async (req, res) => {
-    const {employerId, title, description, skillsRequired, experienceRequired, salaryRange, location } = req.body;
+    const {employerId, title, description, skillsRequired, experienceRequired, expectedSalaryRange, salaryRange, location } = req.body;
     // const employerId = req.user.id;
 
     try {
-        const job = new Job({ employerId, title, description, skillsRequired, experienceRequired, salaryRange, location });
+        const job = new Job({ employerId, title, description, skillsRequired, experienceRequired, expectedSalaryRange, salaryRange, location });
         await job.save();
 
         // Update employer's job list
