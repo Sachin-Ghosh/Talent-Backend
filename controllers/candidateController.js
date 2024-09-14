@@ -4,7 +4,7 @@ const upload = require('../utils/fileUpload');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Create Candidate
+// Create or Update Candidate
 exports.createCandidate = async (req, res) => {
     const { userId, education, experience, resumeLink, skills } = req.body;
 
@@ -14,26 +14,31 @@ exports.createCandidate = async (req, res) => {
             return res.status(400).json({ message: 'User does not exist' });
         }
 
-        const candidateExists = await Candidate.findOne({ userId });
-        if (candidateExists) {
-            return res.status(400).json({ message: 'Candidate profile already exists for this user' });
+        let candidate = await Candidate.findOne({ userId });
+        if (candidate) {
+            // If candidate exists, update the profile
+            candidate.education = education || candidate.education;
+            candidate.experience = experience || candidate.experience;
+            candidate.resumeLink = resumeLink || candidate.resumeLink;
+            candidate.skills = skills || candidate.skills;
+
+            const updatedCandidate = await candidate.save();
+            return res.status(200).json({ message: 'Candidate profile updated', candidate: updatedCandidate });
+        } else {
+            // If candidate doesn't exist, create a new one
+            candidate = new Candidate({ 
+                userId, 
+                education, 
+                experience, 
+                resumeLink, 
+                skills 
+            });
+
+            const savedCandidate = await candidate.save();
+            return res.status(201).json({ message: 'Candidate profile created', candidate: savedCandidate });
         }
-
-        const candidate = new Candidate({ 
-            userId, 
-            education, 
-            experience, 
-            resumeLink, 
-            skills 
-        });
-
-        const savedCandidate = await candidate.save();
-
-        res.status(201).json(savedCandidate);
     } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ message: 'Duplicate key error. This candidate profile may already exist.' });
-        }
+        console.error('Error in createCandidate:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
