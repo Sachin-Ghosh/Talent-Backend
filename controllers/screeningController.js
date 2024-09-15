@@ -9,7 +9,7 @@ exports.startScreening = async (req, res) => {
   const { applicationId } = req.body;
 
   try {
-    const application = await Application.findById(applicationId);
+    const application = await Application.findById(applicationId).populate('jobId').populate('candidateId');
     if (!application) {
       return res.status(404).json({ message: 'Application not found' });
     }
