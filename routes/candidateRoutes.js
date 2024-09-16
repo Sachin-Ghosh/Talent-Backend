@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const candidateController = require('../controllers/candidateController');
-// const { protect } = require('../middlewares/authMiddleware');
+const { authenticateToken } = require('../middlewares/authMiddleware');
 
 // Candidate registration and login routes
 router.post('/register', candidateController.createCandidate);
@@ -20,7 +20,7 @@ router.put('/:id', candidateController.updateCandidate);
 router.delete('/:id',  candidateController.deleteCandidate);
 
 // Protected route for getting candidate profile
-router.get('/profile', candidateController.getProfile);
+router.get('/profile',authenticateToken , candidateController.getProfile);
 
 // Upload resume
 router.post('/:id/resume', candidateController.uploadResume);

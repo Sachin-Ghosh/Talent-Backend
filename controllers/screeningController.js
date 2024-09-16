@@ -14,15 +14,18 @@ exports.startScreening = async (req, res) => {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    const job = await Job.findById(application.jobId);
-    if (!job) {
-      return res.status(404).json({ message: 'Job not found' });
-    }
+    // const job = await Job.findById(application.jobId);
+    // if (!job) {
+    //   return res.status(404).json({ message: 'Job not found' });
+    // }
 
-    const candidate = await Candidate.findOne({ userId: application.candidateId });
-    if (!candidate) {
-      return res.status(404).json({ message: 'Candidate not found' });
-    }
+    // const candidate = await Candidate.findOne({ userId: application.candidateId });
+    // if (!candidate) {
+    //   return res.status(404).json({ message: 'Candidate not found' });
+    // }
+
+    const job = application.jobId;
+    const candidate = application.candidateId;
 
     // Check if screening already exists
     let screening = await Screening.findOne({ applicationId });
@@ -51,7 +54,7 @@ exports.startScreening = async (req, res) => {
 
 
     screening.stage1 = {
-      passed: skillsMissing.length === 0 && skillsMatched.length > 0,
+      passed: skillsMissing.length < 2 && skillsMatched.length >= 2,
       skillsMatched,
       skillsMissing
     };
