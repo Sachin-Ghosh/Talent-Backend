@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 
 // Create or Update Candidate
 exports.createCandidate = async (req, res) => {
-    const { userId, education, experience, resumeLink, skills } = req.body;
+    const { userId, education, experience, resumeLink,bio, skills } = req.body;
 
     try {
         const user = await User.findById(userId);
@@ -29,6 +29,7 @@ exports.createCandidate = async (req, res) => {
             candidate = new Candidate({ 
                 userId, 
                 education, 
+                bio,
                 experience, 
                 resumeLink, 
                 skills 
@@ -68,7 +69,7 @@ exports.getCandidateById = async (req, res) => {
 
 // Update Candidate
 exports.updateCandidate = async (req, res) => {
-    const { education, experience, resumeLink, skills } = req.body;
+    const { education, experience, resumeLink, skills,bio } = req.body;
 
     try {
         const candidate = await Candidate.findById(req.params.id);
@@ -80,6 +81,7 @@ exports.updateCandidate = async (req, res) => {
         candidate.experience = experience || candidate.experience;
         candidate.resumeLink = resumeLink || candidate.resumeLink;
         candidate.skills = skills || candidate.skills;
+        candidate.bio = bio || candidate.bio;
 
         const updatedCandidate = await candidate.save();
         res.json(updatedCandidate);
@@ -153,6 +155,19 @@ exports.getResume = async (req, res) => {
         }
 
         res.download(candidate.resume);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+// Get Candidate by User ID
+exports.getCandidateByUserId = async (req, res) => {
+    try {
+        const candidate = await Candidate.findOne({ userId: req.params.userId });
+        if (!candidate) {
+            return res.status(404).json({ message: 'Candidate not found' });
+        }
+        res.json({ candidateId: candidate._id });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

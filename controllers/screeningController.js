@@ -138,4 +138,43 @@ exports.processStage3 = async (req, res) => {
   }
 };
 
+exports.getScreeningByCandidate = async (req, res) => {
+  const { candidateId } = req.params;
+
+  try {
+    const applications = await Application.find({ candidateId });
+    const applicationIds = applications.map(app => app._id);
+
+    const screenings = await Screening.find({ applicationId: { $in: applicationIds } })
+      .populate({
+        path: 'applicationId',
+        populate: [
+          { path: 'jobId', select: 'title company' },
+          { path: 'candidateId', select: 'name email' }
+        ]
+      });
+
+    if (screenings.length === 0) {
+      return res.status(404).json({ message: 'No screenings found for this candidate' });
+    }
+
+    const screeningData = screenings.map(screening => ({
+      jobTitle: screening.applicationId.jobId.title,
+      company: screening.applicationId.jobId.company,
+      currentStage: screening.currentStage,
+      finalStatus: screening.finalStatus,
+      stage1: screening.stage1,
+      stage2: screening.stage2,
+      stage3: screening.stage3,
+      createdAt: screening.createdAt,
+      updatedAt: screening.updatedAt
+    }));
+
+    res.status(200).json(screeningData);
+  } catch (error) {
+    console.error('Error in getScreeningByCandidate:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 

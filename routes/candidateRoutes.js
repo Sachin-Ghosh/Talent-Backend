@@ -28,5 +28,7 @@ router.post('/:id/resume', candidateController.uploadResume);
 // Get resume
 router.get('/:id/resume', candidateController.getResume);
 
+router.get('/user/:userId', candidateController.getCandidateByUserId);
+
 
 module.exports = router;
