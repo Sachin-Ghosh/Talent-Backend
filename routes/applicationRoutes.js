@@ -20,4 +20,7 @@ router.put('/applications/:id/status', applicationController.updateApplicationSt
 // Delete an application (Employer/Admin only)
 router.delete('/applications/:id', applicationController.deleteApplication);
 
+// Get applications by candidate ID
+router.get('/applications/candidate/:candidateId', applicationController.getApplicationsByCandidateId);
+
 module.exports = router;

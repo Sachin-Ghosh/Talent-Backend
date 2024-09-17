@@ -4,11 +4,11 @@ const Job = require('../models/jobModel');
 
 // Apply for a job (Candidate)
 exports.applyForJob = async (req, res) => {
-    const { jobId,candidateId } = req.body;
+    const { jobId,candidateId,expectedSalary } = req.body;
     // const candidateId = req.user.id; // Assuming the logged-in user is a candidate
 
     try {
-        const application = new Application({ candidateId, jobId });
+        const application = new Application({ candidateId, jobId, expectedSalary });
         await application.save();
 
         // Update candidate's applied jobs
@@ -83,5 +83,27 @@ exports.deleteApplication = async (req, res) => {
         res.status(200).json({ message: 'Application deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+// Get applications by candidate ID
+exports.getApplicationsByCandidateId = async (req, res) => {
+    const { candidateId } = req.params;
+
+    try {
+        const applications = await Application.find({ candidateId })
+            .populate('candidateId')
+            .populate({
+                path: 'jobId',
+                populate: {
+                    path: 'employerId',
+                    select: 'companyName'
+                }
+            })
+            .populate('screeningId');
+
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
