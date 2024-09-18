@@ -161,13 +161,14 @@ exports.getScreeningByCandidate = async (req, res) => {
     const screeningData = screenings.map(screening => ({
       jobTitle: screening.applicationId.jobId.title,
       company: screening.applicationId.jobId.company,
-      currentStage: screening.currentStage,
-      finalStatus: screening.finalStatus,
-      stage1: screening.stage1,
-      stage2: screening.stage2,
-      stage3: screening.stage3,
-      createdAt: screening.createdAt,
-      updatedAt: screening.updatedAt
+      currentStage: screening ? screening.currentStage : 0,
+        finalStatus: screening ? screening.finalStatus : 'Not Started',
+        stage1: screening ? screening.stage1 : null,
+        stage2: screening ? screening.stage2 : null,
+        stage3: screening ? screening.stage3 : null,
+        createdAt: screening ? screening.createdAt : null,
+        updatedAt: screening ? screening.updatedAt : null
+      
     }));
 
     res.status(200).json(screeningData);
