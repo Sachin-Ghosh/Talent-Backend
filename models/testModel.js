@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Job = require("./jobModel"); 
+const Job = require("./jobModel");
 
 const TestSchema = new mongoose.Schema({
   jobId: {
@@ -10,8 +10,12 @@ const TestSchema = new mongoose.Schema({
   questions: [{
     question: String,
     options: [String],
-    correctAnswer: Number
+    correctAnswer: Number,
+    score: Number // Add score field
   }],
+  img: {
+    type: String,
+  },
   duration: Number // in minutes
 }, { timestamps: true });
 
