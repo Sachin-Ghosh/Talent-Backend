@@ -28,7 +28,7 @@ exports.getAvailableSlots = async (req, res) => {
       return res.status(404).json({ message: 'No interview slot found for this job' });
     }
 
-    // const availableSlots = interviewSlot.availableSlots.filter(slot => !slot.isBooked);
+    const availableSlots = interviewSlot.availableSlots;
 
     res.status(200).json({ 
       meetingLink: interviewSlot.meetingLink,
