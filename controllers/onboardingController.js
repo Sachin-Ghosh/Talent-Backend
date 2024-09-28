@@ -2,10 +2,10 @@ const OnboardingTask = require('../models/onboardingTaskModel');
 
 // Create an onboarding task
 exports.createOnboardingTask = async (req, res) => {
-    const { candidateId, taskDescription } = req.body;
+    const { employerId, jobId, taskDescription, requestedDocuments } = req.body;
 
     try {
-        const task = new OnboardingTask({ candidateId, taskDescription });
+        const task = new OnboardingTask({ employerId, jobId, taskDescription, requestedDocuments });
         await task.save();
         res.status(201).json({ message: 'Onboarding task created', task });
     } catch (error) {
@@ -13,10 +13,51 @@ exports.createOnboardingTask = async (req, res) => {
     }
 };
 
+// Get onboarding tasks by jobId
+exports.getOnboardingTasksByJobId = async (req, res) => {
+    const { jobId } = req.params;
+
+    try {
+        const tasks = await OnboardingTask.find({ jobId });
+        if (tasks.length === 0) {
+            return res.status(404).json({ message: 'No onboarding tasks found for this job ID' });
+        }
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+// Upload files for a specific onboarding task
+exports.uploadFiles = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const task = await OnboardingTask.findById(id);
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        const uploadedFiles = req.files.map(file => ({
+            fileName: file.originalname,
+            filePath: file.path
+        }));
+
+        task.uploadedFiles.push(...uploadedFiles);
+        await task.save();
+
+        res.json({ message: 'Files uploaded successfully', task });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
 // Get all onboarding tasks
 exports.getAllOnboardingTasks = async (req, res) => {
     try {
-        const tasks = await OnboardingTask.find().populate('candidateId', 'name email');
+        const tasks = await OnboardingTask.find()
         res.json(tasks);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

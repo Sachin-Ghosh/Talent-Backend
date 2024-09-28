@@ -1,6 +1,7 @@
 var express = require('express');
 const cors = require('cors'); // Import the cors middleware
 const path = require('path');
+const fs = require('fs');
 var app = express();
 
 require('dotenv').config(); // Load environment variables from .env file
@@ -21,6 +22,7 @@ const screeningRoutes = require('./routes/screeningRoutes');
 const testRoutes = require('./routes/testRoutes');
 const interviewSlotRoutes = require('./routes/interviewSlotRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const documentUploadStatusRoutes = require('./routes/otDocUploadRoutes');
 
 
 
@@ -34,7 +36,15 @@ const connectDB = require('./config/db');
 connectDB();
 
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
 
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('Uploads directory created:', uploadsDir);
+} else {
+    console.log('Uploads directory already exists:', uploadsDir);
+}
 
 
 
@@ -64,6 +74,7 @@ app.use('/api/interview-slots', interviewSlotRoutes);
 app.use('/api/blogs', blogRoutes);
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/document-upload-status', documentUploadStatusRoutes);
 // admin routes
 
 // app.use(adminBroApp);
