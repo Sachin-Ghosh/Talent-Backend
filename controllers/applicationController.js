@@ -20,10 +20,24 @@ exports.applyForJob = async (req, res) => {
     }
 };
 
+// // Get all applications (Admin/Employer)
+// exports.getAllApplications = async (req, res) => {
+//     try {
+//         const applications = await Application.find().populate('candidateId', 'name').populate('jobId', 'title');
+//         res.status(200).json(applications);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Server error', error });
+//     }
+// };
 // Get all applications (Admin/Employer)
 exports.getAllApplications = async (req, res) => {
+    const { jobId } = req.query; // Get jobId from query parameters
+
     try {
-        const applications = await Application.find().populate('candidateId', 'name').populate('jobId', 'title');
+        const query = jobId ? { jobId } : {}; // Filter by jobId if provided
+        const applications = await Application.find(query)
+            .populate('candidateId', 'name')
+            .populate('jobId', 'title');
         res.status(200).json(applications);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
