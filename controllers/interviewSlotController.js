@@ -23,15 +23,16 @@ exports.getAvailableSlots = async (req, res) => {
   const { jobId } = req.params;
 
   try {
-    const interviewSlot = await InterviewSlot.findOne({ jobId });
-    if (!interviewSlot) {
-      return res.status(404).json({ message: 'No interview slot found for this job' });
+    const interviewSlots = await InterviewSlot.find({ jobId }); // Changed from findOne to find
+    if (interviewSlots.length === 0) {
+      return res.status(404).json({ message: 'No interview slots found for this job' });
     }
 
-    const availableSlots = interviewSlot.availableSlots;
+    // Flatten the available slots from all interview slots
+    const availableSlots = interviewSlots.flatMap(slot => slot.availableSlots);
 
     res.status(200).json({ 
-      meetingLink: interviewSlot.meetingLink,
+      meetingLink: interviewSlots[0].meetingLink, // Assuming all have the same meeting link
       availableSlots: availableSlots 
     });
   } catch (error) {

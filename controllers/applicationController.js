@@ -31,10 +31,18 @@ exports.applyForJob = async (req, res) => {
 // };
 // Get all applications (Admin/Employer)
 exports.getAllApplications = async (req, res) => {
-    const { jobId } = req.query; // Get jobId from query parameters
+    const { jobId, candidateId } = req.query; // Get jobId and candidateId from query parameters
 
     try {
-        const query = jobId ? { jobId } : {}; // Filter by jobId if provided
+        const query = {}; // Initialize an empty query object
+
+        if (jobId) {
+            query.jobId = jobId; // Add jobId filter if provided
+        }
+        if (candidateId) {
+            query.candidateId = candidateId; // Add candidateId filter if provided
+        }
+
         const applications = await Application.find(query)
             .populate('candidateId', 'name')
             .populate('jobId', 'title');
