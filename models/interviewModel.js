@@ -1,9 +1,7 @@
-// models/Interview.js
 const mongoose = require('mongoose');
 
 const Job = require("./jobModel"); 
 const Candidate = require("./candidateModel"); 
-
 
 const InterviewSchema = new mongoose.Schema({
     jobId: {
@@ -28,14 +26,22 @@ const InterviewSchema = new mongoose.Schema({
     feedback: {
         type: String,
     },
+    meetingLink: { // New field for meeting link
+        type: String,
+        required: true,
+    },
+    bookedSlot: { // New field for booked slot details
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'InterviewSlot', // Reference to the InterviewSlot model
+    },
     createdAt: {
         type: Date,
         default: Date.now,
-      },
+    },
     updatedAt: {
         type: Date,
         default: Date.now,
-      }
+    }
 }, { timestamps: true });
 
 const Interview = mongoose.model('Interview', InterviewSchema);
