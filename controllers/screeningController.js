@@ -14,15 +14,6 @@ exports.startScreening = async (req, res) => {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    // const job = await Job.findById(application.jobId);
-    // if (!job) {
-    //   return res.status(404).json({ message: 'Job not found' });
-    // }
-
-    // const candidate = await Candidate.findOne({ userId: application.candidateId });
-    // if (!candidate) {
-    //   return res.status(404).json({ message: 'Candidate not found' });
-    // }
 
     const job = application.jobId;
     const candidate = application.candidateId;
