@@ -31,10 +31,7 @@ exports.getAvailableSlots = async (req, res) => {
 
     const availableSlots = interviewSlots.flatMap(slot => slot.availableSlots);
 
-    // Log the raw data before sending the response
-    // console.log('Interview Slots:', JSON.stringify(interviewSlots, null, 2));
-    // console.log('Available Slots:', JSON.stringify(availableSlots, null, 2)); // Log available slots
-
+    
     res.status(200).json({ 
       meetingLink: interviewSlots[0].meetingLink,
       availableSlots: availableSlots 
